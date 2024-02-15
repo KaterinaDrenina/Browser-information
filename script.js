@@ -36,3 +36,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
 });
+
+function getQueryParams() {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const devices = urlParams.get('devices') ? urlParams.get('devices').split(',') : [];
+    return devices;
+}
+
+function updateCheckboxesFromURL(devices) {
+    document.querySelectorAll('ul li input[type="checkbox"]').forEach(checkbox => {
+        const device = checkbox.parentNode.textContent.trim().toLowerCase();
+        checkbox.checked = devices.includes(device);
+    });
+
+}
+
+function updateURLFromCheckboxes() {
+    const selectedDevices = Array.from(document.querySelectorAll('ul li input[type="checkbox"]:checked'))
+                                .map(checkbox => checkbox.parentNode.textContent.trim().toLowerCase());
+
+    const newQueryString = selectedDevices.length > 0 ? `?devices=${selectedDevices.join(',')}` : '';
+    window.history.replaceState(null, '', window.location.pathname + newQueryString);
+}
+
+
+document.querySelectorAll('ul li input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+    updateURLFromCheckboxes();
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const devices = getQueryParams();
+    updateCheckboxesFromURL(devices);
+});
